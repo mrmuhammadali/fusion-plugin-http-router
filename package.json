@@ -7,6 +7,12 @@
     "dist",
     "src"
   ],
+  "keywords": [
+    "fusionjs",
+    "fusion-plugin",
+    "http-router",
+    "fusion-restful-routes"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
   "browser": {
