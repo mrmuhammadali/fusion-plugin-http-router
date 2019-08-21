@@ -1,7 +1,7 @@
 <!--
   Thank you for taking the time to submit an issue.
 
-  Before opening a new issue, please search existing issues (https://github.com/fusionjs/fusion-plugin-rpc/issues)
+  Before opening a new issue, please search existing issues (https://github.com/fusionjs/issues)
   to double-check your issue isn't already known.
 
   To make it easier for us to help you — please follow the suggested format below.
@@ -33,7 +33,7 @@
 
 ### Your environment
 
-* fusion-plugin-rpc version:
+* fusion-plugin-http-router version:
 
 * Node.js version (`node --version`):
 

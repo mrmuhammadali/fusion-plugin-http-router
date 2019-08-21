@@ -1,17 +1,8 @@
-/** Copyright (c) 2018 Uber Technologies, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @flow
- */
+// @flow
+import browserPlugin from './browser';
+import serverPlugin from './server';
 
-// import browserDataFetching from './browser'
-import serverPlugin from './plugin';
-
-export {default as ResponseError} from './response-error';
-
-export default __NODE__ && serverPlugin;
+export default __NODE__ ? serverPlugin : browserPlugin;
 
 export {
   BodyParserOptionsToken,
