@@ -31,7 +31,6 @@ import App from 'fusion-core';
 import HTTPRouter, {
   HTTPRouterToken,
   HTTPHandlersToken,
-  ResponseError,
 } from 'fusion-plugin-http-router';
 
 // Define your http routes and methods server side
@@ -48,7 +47,7 @@ const handlers = __NODE__ && {
       try {
         deleteUser();
       } catch (e) {
-        const error = new ResponseError('Failed to delete user');
+        const error = new Error('Failed to delete user');
         error.code = 'DELETEUSER';
         error.meta = {
           custom: 'metadata',
@@ -79,7 +78,7 @@ export default () => {
 ##### `HTTPRouter`
 
 ```js
-import HTTPRouter from 'fusion-plugin-http-router';
+import HTTPRouter from 'fusion-plugin-http-router'
 ```
 
 The HTTPRouter plugin. Registers HTTP routes and handlers.
@@ -87,7 +86,7 @@ The HTTPRouter plugin. Registers HTTP routes and handlers.
 ##### `HTTPRouterToken`
 
 ```js
-import {HTTPRouterToken} from 'fusion-plugin-http-router';
+import { HTTPRouterToken } from 'fusion-plugin-http-router'
 ```
 
 The canonical token for the HTTPRouter plugin. Typically, it should be registered with
@@ -98,7 +97,7 @@ the HTTPRouter plugin.
 ##### `HTTPHandlersToken`
 
 ```js
-import {HTTPHandlersToken} from 'fusion-plugin-http-router';
+import { HTTPHandlersToken } from 'fusion-plugin-http-router'
 ```
 
 Configures what HTTP Router handlers exist. Required. Server-only.
@@ -111,27 +110,3 @@ type HTTPHandlers = Object<Object<string, () => any>>
 
 You can register a value of type `HTTPHandlers` or a Plugin that provides a value
 of type `HTTPHandlers`.
-
----
-
-### Error Handling
-
-Use the `ResponseError` error subclass for sending error responses. If this
-error class is not used, a generic message will be sent to the client.
-
-```js
-import {ResponseError} from 'fusion-plugin-http-router';
-
-function testHandler() {
-  try {
-    doThing();
-  } catch (e) {
-    const error = new ResponseError('Failed to do thing');
-    error.code = 'DOTHING';
-    error.meta = {
-      custom: 'metadata',
-    };
-    throw error;
-  }
-}
-```
