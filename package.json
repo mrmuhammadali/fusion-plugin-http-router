@@ -1,7 +1,7 @@
 {
   "name": "fusion-plugin-http-router",
   "description": "Registers http routes and handlers on the server.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "repository": "mrmuhammadali/fusion-plugin-http-router",
   "files": [
     "dist",
