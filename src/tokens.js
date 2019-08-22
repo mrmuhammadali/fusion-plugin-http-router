@@ -1,12 +1,14 @@
 // @flow
-import {createToken, type Token} from 'fusion-core';
+import {createToken, type FusionPlugin, type Token} from 'fusion-core';
 
-import type {HandlersType} from './types';
+import type {DepsType, HandlersType, ServiceType} from './types';
 
-export const HTTPRouterToken: Token<any> = createToken('HTTPRouter');
+export const HttpRouterToken: Token<
+  FusionPlugin<DepsType, ServiceType>
+> = createToken('HttpRouter');
 
-export const HTTPHandlersToken: Token<HandlersType> = createToken(
-  'HTTPHandlersToken'
+export const HttpHandlersToken: Token<HandlersType> = createToken(
+  'HttpHandlersToken'
 );
 export const BodyParserOptionsToken: Token<Object> = createToken(
   'BodyParserOptionsToken'

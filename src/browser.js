@@ -1,4 +1,6 @@
 // @flow
 import type {FusionPlugin} from 'fusion-core';
 
-export default ((null: any): FusionPlugin<Object, void>);
+import type {DepsType, ServiceType} from './types';
+
+export default ((null: any): FusionPlugin<DepsType, ServiceType>);

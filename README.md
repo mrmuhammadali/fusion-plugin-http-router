@@ -1,6 +1,6 @@
 # fusion-plugin-http-router
 
-Register and handle HTTP routes in a fusion app.
+Register and handle Http routes in a fusion app.
 
 ---
 
@@ -28,9 +28,9 @@ yarn add fusion-plugin-http-router
 // src/main.js
 import React from 'react';
 import App from 'fusion-core';
-import HTTPRouter, {
-  HTTPRouterToken,
-  HTTPHandlersToken,
+import HttpRouter, {
+  HttpRouterToken,
+  HttpHandlersToken,
 } from 'fusion-plugin-http-router';
 
 // Define your http routes and methods server side
@@ -62,8 +62,8 @@ const handlers = __NODE__ && {
 export default () => {
   const app = new App(<div />);
 
-  app.register(HTTPRouterToken, HTTPRouter);
-  __NODE__ && app.register(HTTPHandlersToken, handlers)
+  app.register(HttpRouterToken, HttpRouter);
+  app.register(HttpHandlersToken, handlers)
 
   return app;
 };
@@ -75,38 +75,38 @@ export default () => {
 
 #### Registration API
 
-##### `HTTPRouter`
+##### `HttpRouter`
 
 ```js
-import HTTPRouter from 'fusion-plugin-http-router'
+import HttpRouter from 'fusion-plugin-http-router'
 ```
 
-The HTTPRouter plugin. Registers HTTP routes and handlers.
+The HttpRouter plugin. Registers http routes and handlers.
 
-##### `HTTPRouterToken`
+##### `HttpRouterToken`
 
 ```js
-import { HTTPRouterToken } from 'fusion-plugin-http-router'
+import { HttpRouterToken } from 'fusion-plugin-http-router'
 ```
 
-The canonical token for the HTTPRouter plugin. Typically, it should be registered with
-the HTTPRouter plugin.
+The canonical token for the HttpRouter plugin. Typically, it should be registered with
+the HttpRouter plugin.
 
 #### Dependencies
 
-##### `HTTPHandlersToken`
+##### `HttpHandlersToken`
 
 ```js
-import { HTTPHandlersToken } from 'fusion-plugin-http-router'
+import { HttpHandlersToken } from 'fusion-plugin-http-router'
 ```
 
-Configures what HTTP Router handlers exist. Required. Server-only.
+Configures what http Router handlers exist. Required. Server-only.
 
 ###### Types
 
 ```flow
-type HTTPHandlers = Object<Object<string, () => any>>
+type HttpHandlers = Object<Object<string, () => any>>
 ```
 
-You can register a value of type `HTTPHandlers` or a Plugin that provides a value
-of type `HTTPHandlers`.
+You can register a value of type `HttpHandlers` or a Plugin that provides a value
+of type `HttpHandlers`.

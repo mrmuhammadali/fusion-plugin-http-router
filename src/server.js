@@ -1,19 +1,29 @@
 // @flow
 /* eslint-env node */
 import bodyParser from 'koa-bodyparser';
-import {createPlugin, memoize, type Context} from 'fusion-core';
-import {matchPath} from 'react-router';
+import {
+  createPlugin,
+  memoize,
+  type Context,
+  type FusionPlugin,
+} from 'fusion-core';
+import {match, matchPath} from 'react-router';
 
-import {BodyParserOptionsToken, HTTPHandlersToken} from './tokens';
-import type {HandlersType, ServiceType} from './types';
+import {BodyParserOptionsToken, HttpHandlersToken} from './tokens';
+import type {
+  DepsObjectType,
+  DepsType,
+  HandlersType,
+  ServiceType,
+} from './types';
 
 export function getHttpHandler(
   currentPath: string,
   method: string,
   paths: string[],
   handlers: HandlersType
-): [Object, Function] | [] {
-  const {path, params = {}, isExact} =
+): [Function, Object] | Array<any> {
+  const {path, params = {}, isExact}: match<Object> =
     matchPath(currentPath, {
       path: paths,
     }) || {};
@@ -33,59 +43,60 @@ export function getHttpHandler(
   return [];
 }
 
-const plugin =
-  __NODE__ &&
-  createPlugin({
-    deps: {
-      bodyParserOptions: BodyParserOptionsToken.optional,
-      handlers: HTTPHandlersToken,
-    },
+const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
+  deps: {
+    bodyParserOptions: BodyParserOptionsToken.optional,
+    handlers: HttpHandlersToken,
+  },
 
-    provides: ({handlers, bodyParserOptions}) => {
-      if (!handlers || typeof handlers !== 'object') {
-        throw new Error(
-          'Missing/incorrect handlers registered to HTTPHandlersToken'
-        );
+  provides: ({handlers, bodyParserOptions}: DepsObjectType): ServiceType => {
+    if (!handlers || typeof handlers !== 'object') {
+      throw new Error(
+        'Missing/incorrect handlers registered to HttpHandlersToken'
+      );
+    }
+
+    const parseBody = bodyParser(bodyParserOptions);
+    const paths: string[] = Object.keys(handlers);
+    const from = memoize(async (ctx: Context): Function | null => {
+      const {path, method, query} = ctx;
+      const [handler, params] = getHttpHandler(path, method, paths, handlers);
+
+      if (typeof handler !== 'function') {
+        return null;
       }
 
-      const parseBody = bodyParser(bodyParserOptions);
-      const paths = Object.keys(handlers);
-      const from = memoize(async ctx => {
-        const {path, method, query} = ctx;
-        const [handler, params] = getHttpHandler(path, method, paths, handlers);
+      await parseBody(ctx, () => Promise.resolve());
+      return () => handler({...params, ...query, ...ctx.request.body}, ctx);
+    });
 
-        if (typeof handler !== 'function') {
-          return null;
-        }
+    return {from};
+  },
 
-        await parseBody(ctx, () => Promise.resolve());
-        return () => handler({...params, ...query, ...ctx.request.body}, ctx);
-      });
+  middleware: (deps: DepsObjectType, service: ServiceType) => async (
+    ctx: Context,
+    next: () => Promise<any>
+  ) => {
+    try {
+      const handler = await service.from(ctx);
 
-      return {from};
-    },
-
-    middleware: (deps, service: ServiceType) => async (ctx: Context, next) => {
-      try {
-        const handler = await service.from(ctx);
-
-        if (typeof handler === 'function') {
-          ctx.body = await handler();
-        }
-      } catch (error) {
-        ctx.body = {
-          status: 'failure',
-          data: {
-            code: error.code,
-            message: error.message,
-            stack: error.stack,
-            meta: error.meta,
-          },
-        };
+      if (typeof handler === 'function') {
+        ctx.body = await handler();
       }
+    } catch (error) {
+      ctx.body = {
+        status: 'failure',
+        data: {
+          code: error.code,
+          message: error.message,
+          stack: error.stack,
+          meta: error.meta,
+        },
+      };
+    }
 
-      return next();
-    },
-  });
+    return next();
+  },
+});
 
 export default plugin;

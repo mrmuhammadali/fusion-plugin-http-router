@@ -1,9 +1,9 @@
 // @flow
 import App, {type Context} from 'fusion-core';
-import {createRequestContext, getService} from 'fusion-test-utils';
+import {getSimulator} from 'fusion-test-utils';
 import tape from 'tape-cup';
 
-import Plugin, {HTTPHandlersToken} from '../index';
+import HttpRouter, {HttpHandlersToken, HttpRouterToken} from '../index';
 
 const handlers = {
   '/api/:id': {
@@ -15,33 +15,48 @@ const handlers = {
 /* Test fixtures */
 const appCreator = () => {
   const app = new App('test', el => el);
-  app.register(HTTPHandlersToken, handlers);
+  app.register(HttpRouterToken, HttpRouter);
+  app.register(HttpHandlersToken, handlers);
 
-  return () => app;
+  return app;
 };
+const simulator = getSimulator(appCreator());
 
-tape('Test plugin', async t => {
-  const getCtx: Context = createRequestContext('/api/123?query=abc');
-  const postCtx: Context = createRequestContext('/api/123', {
+tape('Test GET request', async t => {
+  const response: Context = await simulator.request('/api/123?query=abc');
+
+  t.deepEqual(
+    response.body,
+    {id: '123', query: 'abc'},
+    'should do GET request'
+  );
+  t.end();
+});
+
+tape('Test POST request', async t => {
+  const response: Context = await simulator.request('/api/123', {
     method: 'POST',
     body: {name: 'Test'},
   });
-  const service = getService(appCreator(), Plugin);
 
-  if (!Plugin.middleware) {
-    t.end();
-    return;
-  }
-
-  await Plugin.middleware(null, service)(getCtx, () => Promise.resolve());
-  await Plugin.middleware(null, service)(postCtx, () => Promise.resolve());
-
-  t.deepEqual(getCtx.body, {id: '123', query: 'abc'}, 'should do GET request');
   t.deepEqual(
-    postCtx.body,
+    response.body,
     {id: '123', name: 'Test'},
     'should do POST request'
   );
 
+  t.end();
+});
+
+tape('Test multiple requests', async t => {
+  const promise = simulator.request('/api/123?query=abc');
+  const responses = await Promise.all([promise, promise, promise, promise]);
+  const responseBodies = responses.map(response => response.body);
+
+  t.deepEqual(
+    responseBodies,
+    responseBodies.map(() => ({id: '123', query: 'abc'})),
+    'should do multiple requests'
+  );
   t.end();
 });

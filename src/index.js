@@ -6,6 +6,6 @@ export default __NODE__ ? serverPlugin : browserPlugin;
 
 export {
   BodyParserOptionsToken,
-  HTTPHandlersToken,
-  HTTPRouterToken,
+  HttpHandlersToken,
+  HttpRouterToken,
 } from './tokens';
