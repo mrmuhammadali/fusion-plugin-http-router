@@ -1,7 +1,7 @@
 {
   "name": "fusion-plugin-http-router",
   "description": "Registers http routes and handlers on the server.",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "repository": "mrmuhammadali/fusion-plugin-http-router",
   "files": [
     "dist",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "koa-bodyparser": "^4.2.1",
-    "react-router": "^5.0.1"
+    "path-to-regexp": "^3.0.0"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.0.0",

@@ -7,7 +7,6 @@ import {
   type Context,
   type FusionPlugin,
 } from 'fusion-core';
-import {match, matchPath} from 'react-router';
 
 import {BodyParserOptionsToken, HttpHandlersToken} from './tokens';
 import type {
@@ -16,6 +15,7 @@ import type {
   HandlersType,
   ServiceType,
 } from './types';
+import matchPath, {type Match} from './matchPath';
 
 export function getHttpHandler(
   currentPath: string,
@@ -23,14 +23,10 @@ export function getHttpHandler(
   paths: string[],
   handlers: HandlersType
 ): [Function, Object] | Array<any> {
-  const {path, params = {}, isExact}: match<Object> =
-    matchPath(currentPath, {
-      path: paths,
-    }) || {};
-
+  const {path, params, isExact}: Match = matchPath(currentPath, paths);
   const handler = handlers[path] && handlers[path][method];
 
-  if (path && handler && isExact) {
+  if (handler && isExact) {
     if (typeof handler !== 'function') {
       throw new Error(
         `Missing/incorrect handler registered to ${method} of ${path}.`
