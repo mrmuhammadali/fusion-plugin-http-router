@@ -36,10 +36,10 @@ import HttpRouter, {
 // Define your http routes and methods server side
 const handlers = __NODE__ && {
   '/api/user/:id': {
-    GET: async ({id}, ctx) => {
+    GET: async ({params: {id}}, ctx) => {
       return {some: 'data' + id};
     },
-    PUT: async ({id, ...args}, ctx) => {
+    PUT: async ({params: {id}, query, body}, ctx) => {
       return {some: 'data' + id};
     },
     DELETE: async (args, ctx) => {

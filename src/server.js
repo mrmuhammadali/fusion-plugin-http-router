@@ -1,6 +1,6 @@
 // @flow
 /* eslint-env node */
-import bodyParser from 'koa-bodyparser';
+import bodyParser from 'koa-body';
 import {
   createPlugin,
   memoize,
@@ -45,14 +45,16 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
     handlers: HttpHandlersToken,
   },
 
-  provides: ({handlers, bodyParserOptions}: DepsObjectType): ServiceType => {
+  provides: (deps: DepsObjectType): ServiceType => {
+    const {handlers, bodyParserOptions = {}} = deps;
+
     if (!handlers || typeof handlers !== 'object') {
       throw new Error(
         'Missing/incorrect handlers registered to HttpHandlersToken'
       );
     }
 
-    const parseBody = bodyParser(bodyParserOptions);
+    const parseBody = bodyParser({...bodyParserOptions, multipart: true});
     const paths: string[] = Object.keys(handlers);
     const from = memoize(async (ctx: Context): Function | null => {
       const {path, method, query} = ctx;
@@ -63,7 +65,9 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
       }
 
       await parseBody(ctx, () => Promise.resolve());
-      return () => handler({...params, ...query, ...ctx.request.body}, ctx);
+      const {body, files = {}} = ctx.request;
+
+      return () => handler({params, query, body, files}, ctx);
     });
 
     return {from};

@@ -23,11 +23,11 @@ const appCreator = () => {
 const simulator = getSimulator(appCreator());
 
 tape('Test GET request', async t => {
-  const response: Context = await simulator.request('/api/123?query=abc');
+  const response: Context = await simulator.request('/api/123?search=abc');
 
   t.deepEqual(
     response.body,
-    {id: '123', query: 'abc'},
+    {params: {id: '123'}, query: {search: 'abc'}, files: {}, body: {}},
     'should do GET request'
   );
   t.end();
@@ -41,7 +41,7 @@ tape('Test POST request', async t => {
 
   t.deepEqual(
     response.body,
-    {id: '123', name: 'Test'},
+    {params: {id: '123'}, query: {}, files: {}, body: {}},
     'should do POST request'
   );
 
@@ -49,13 +49,18 @@ tape('Test POST request', async t => {
 });
 
 tape('Test multiple requests', async t => {
-  const promise = simulator.request('/api/123?query=abc');
+  const promise = simulator.request('/api/123?search=abc');
   const responses = await Promise.all([promise, promise, promise, promise]);
   const responseBodies = responses.map(response => response.body);
 
   t.deepEqual(
     responseBodies,
-    responseBodies.map(() => ({id: '123', query: 'abc'})),
+    responseBodies.map(() => ({
+      params: {id: '123'},
+      query: {search: 'abc'},
+      files: {},
+      body: {},
+    })),
     'should do multiple requests'
   );
   t.end();

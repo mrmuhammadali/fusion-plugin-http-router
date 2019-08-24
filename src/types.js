@@ -1,11 +1,11 @@
 // @flow
 import type {Context} from 'fusion-core';
-import {Options} from 'koa-bodyparser';
+import {IKoaBodyOptions} from 'koa-body';
 
 import {BodyParserOptionsToken, HttpHandlersToken} from './tokens';
 
 export type DepsObjectType = {
-  bodyParserOptions: Options,
+  bodyParserOptions: IKoaBodyOptions,
   handlers: HandlersType,
 };
 

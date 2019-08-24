@@ -1,7 +1,7 @@
 {
   "name": "fusion-plugin-http-router",
   "description": "Registers http routes and handlers on the server.",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "repository": "mrmuhammadali/fusion-plugin-http-router",
   "files": [
     "dist",
@@ -27,7 +27,7 @@
     "./dist/browser.es2015.es.js": "./dist/browser.es2017.es.js"
   },
   "dependencies": {
-    "koa-bodyparser": "^4.2.1",
+    "koa-body": "^4.1.1",
     "path-to-regexp": "^3.0.0"
   },
   "devDependencies": {
@@ -57,7 +57,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "lint": "eslint . --ignore-path .gitignore",
+    "lint": "eslint . --ignore-path .gitignore --fix",
     "build": "yarn clean && cup build",
     "build-test": "rm -rf dist-tests && cup build-tests",
     "just-test": "node_modules/.bin/unitest --browser=dist-tests/browser.js --node=dist-tests/node.js",
