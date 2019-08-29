@@ -35,28 +35,38 @@ import HttpRouter, {
 
 // Define your http routes and methods server side
 const handlers = __NODE__ && {
-  '/api/user/:id': {
-    GET: async ({params: {id}}, ctx) => {
-      return {some: 'data' + id};
-    },
-    PUT: async ({params: {id}, query, body}, ctx) => {
-      return {some: 'data' + id};
-    },
-    DELETE: async (args, ctx) => {
-      // Error Handling Example
-      try {
-        deleteUser();
-      } catch (e) {
-        const error = new Error('Failed to delete user');
-        error.code = 'DELETEUSER';
-        error.meta = {
-          custom: 'metadata',
-        };
-        throw error;
+  '/api': {
+    '/users': {
+      POST: async () => {
+        const user = createUser();
+        return user;
+      },
+      ':id': {
+        GET: async ({params: {id}}, ctx) => {
+          return {some: 'data' + id};
+        },
+        PUT: async ({params: {id}, query, body}, ctx) => {
+          updateUser(body);
+          return {some: 'data' + id};
+        },
+        delete: async (args, ctx) => {
+          // Error Handling Example
+          try {
+            deleteUser();
+          } catch (e) {
+            const error = new Error('Failed to delete user');
+            error.code = 'DELETEUSER';
+            error.meta = {
+              custom: 'metadata',
+            };
+            throw error;
+          }
+        },
       }
     },
+
+    '/book': {...}
   },
-  '/api/book': {...}
 };
 
 export default () => {

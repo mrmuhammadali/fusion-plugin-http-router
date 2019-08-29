@@ -15,7 +15,8 @@ import type {
   HandlersType,
   ServiceType,
 } from './types';
-import matchPath, {type Match} from './matchPath';
+import flatten from './utils/flatten';
+import matchPath, {type Match} from './utils/matchPath';
 
 export function getHttpHandler(
   currentPath: string,
@@ -54,11 +55,17 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
       );
     }
 
+    const flatHandlers = flatten(handlers);
     const parseBody = bodyParser({...bodyParserOptions, multipart: true});
-    const paths: string[] = Object.keys(handlers);
+    const paths: string[] = Object.keys(flatHandlers);
     const from = memoize(async (ctx: Context): Function | null => {
       const {path, method, query} = ctx;
-      const [handler, params] = getHttpHandler(path, method, paths, handlers);
+      const [handler, params] = getHttpHandler(
+        path,
+        method,
+        paths,
+        flatHandlers
+      );
 
       if (typeof handler !== 'function') {
         return null;
@@ -67,7 +74,7 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
       await parseBody(ctx, () => Promise.resolve());
       const {body, files = {}} = ctx.request;
 
-      return () => handler({params, query, body, files}, ctx);
+      return (...args) => handler({params, query, body, files}, ...args);
     });
 
     return {from};
@@ -81,7 +88,7 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
       const handler = await service.from(ctx);
 
       if (typeof handler === 'function') {
-        ctx.body = await handler();
+        ctx.body = await handler(ctx);
       }
     } catch (error) {
       ctx.body = {
