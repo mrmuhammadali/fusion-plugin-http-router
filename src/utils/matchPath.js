@@ -37,11 +37,11 @@ export default function matchPath(
     (final, path) => {
       const match = matchUri(url, path);
 
-      if (!match.isExact) {
-        return final;
+      if (match.isExact && !final.isExact) {
+        return match;
       }
 
-      return match;
+      return final;
     },
     {isExact: false, params: {}, path: ''}
   );

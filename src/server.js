@@ -39,7 +39,7 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
 
     if (invalidPath) {
       throw new Error(
-        `One of the handler is missing/incorrect registered against path "${invalidPath}".`
+        `One of the handlers is missing/incorrect registered against path "${invalidPath}".`
       );
     }
 
