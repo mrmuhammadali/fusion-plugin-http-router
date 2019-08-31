@@ -15,6 +15,14 @@ import {
   getHandler,
   getInvalidPath,
 } from './utils/handlerUtils';
+import {getPatternedPaths} from './utils/pathUtils';
+
+function comparator(a, b) {
+  const aLength = a.split(':').length;
+  const bLength = b.split(':').length;
+
+  return aLength < bLength ? -1 : 1;
+}
 
 const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
   deps: {
@@ -32,7 +40,7 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
     }
 
     const flatHandlers = flattenHandlers(handlers);
-    const paths: string[] = Object.keys(flatHandlers);
+    const paths: string[] = Object.keys(flatHandlers).sort(comparator);
     // eslint-disable-next-line no-console
     console.log('Registered Paths:', JSON.stringify(paths, null, 2));
     const invalidPath = getInvalidPath(flatHandlers);
@@ -44,10 +52,16 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
     }
 
     const parseBody = bodyParser({...bodyParserOptions, multipart: true});
+    const patternedPaths = getPatternedPaths(paths);
 
     const from = memoize(async (ctx: Context): Function | null => {
       const {path, method, query} = ctx;
-      const [handler, params] = getHandler(path, method, paths, flatHandlers);
+      const [handler, params] = getHandler(
+        path,
+        method,
+        patternedPaths,
+        flatHandlers
+      );
 
       if (typeof handler !== 'function') {
         return null;

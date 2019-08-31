@@ -18,6 +18,12 @@ export type HandlersType = {
   [string]: {[string]: (args: Object, ctx: Context) => any},
 };
 
+export type PatternedPath = {
+  path: string,
+  pattern: RegExp,
+  keys: string[],
+};
+
 export type ServiceType = {
   from: (ctx: Context) => null | Function,
 };

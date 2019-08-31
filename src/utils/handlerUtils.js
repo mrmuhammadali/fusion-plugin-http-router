@@ -1,6 +1,6 @@
 // @flow
-import type {HandlersType} from '../types';
-import matchPath, {type Match} from './matchPath';
+import type {HandlersType, PatternedPath} from '../types';
+import {matchPath, type Match} from './pathUtils';
 
 const methods = new Set([
   'CONNECT',
@@ -54,7 +54,7 @@ export function flattenHandlers(handlers: Object): HandlersType {
 export function getHandler(
   currentPath: string,
   method: string,
-  paths: string[],
+  paths: PatternedPath[],
   handlers: HandlersType
 ): [Function, Object] | Array<any> {
   const {path, params, isExact}: Match = matchPath(currentPath, paths);
