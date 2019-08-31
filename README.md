@@ -72,8 +72,10 @@ const handlers = __NODE__ && {
 export default () => {
   const app = new App(<div />);
 
-  app.register(HttpRouterToken, HttpRouter);
-  app.register(HttpHandlersToken, handlers)
+  if (__NODE__) {
+    app.register(HttpRouterToken, HttpRouter);
+    app.register(HttpHandlersToken, handlers);
+  }
 
   return app;
 };
@@ -115,8 +117,24 @@ Configures what http Router handlers exist. Required. Server-only.
 ###### Types
 
 ```flow
-type HttpHandlers = Object<Object<string, () => any>>
+type Args = {
+  params: Object,
+  query: Object,
+  body: Object,
+  files: Object
+}
+
+type HttpHandlers = {
+  [string]: { [string]: (args: Args, ctx: Context) => any },
+}
 ```
 
-You can register a value of type `HttpHandlers` or a Plugin that provides a value
-of type `HttpHandlers`.
+You can register a value of type `HttpHandlers`.
+
+##### `BodyParserOptionsToken`
+
+```js
+import { BodyParserOptionsToken } from 'fusion-plugin-http-router'
+```
+
+Configures the options for [`koa-body`](https://www.npmjs.com/package/koa-body), internally used for parsing. Optional. Server-only.

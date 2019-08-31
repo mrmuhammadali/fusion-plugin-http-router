@@ -9,36 +9,12 @@ import {
 } from 'fusion-core';
 
 import {BodyParserOptionsToken, HttpHandlersToken} from './tokens';
-import type {
-  DepsObjectType,
-  DepsType,
-  HandlersType,
-  ServiceType,
-} from './types';
-import flatten from './utils/flatten';
-import matchPath, {type Match} from './utils/matchPath';
-
-export function getHttpHandler(
-  currentPath: string,
-  method: string,
-  paths: string[],
-  handlers: HandlersType
-): [Function, Object] | Array<any> {
-  const {path, params, isExact}: Match = matchPath(currentPath, paths);
-  const handler = handlers[path] && handlers[path][method];
-
-  if (handler && isExact) {
-    if (typeof handler !== 'function') {
-      throw new Error(
-        `Missing/incorrect handler registered to ${method} of ${path}.`
-      );
-    }
-
-    return [handler, params];
-  }
-
-  return [];
-}
+import type {DepsObjectType, DepsType, ServiceType} from './types';
+import {
+  flattenHandlers,
+  getHandler,
+  getInvalidPath,
+} from './utils/handlerUtils';
 
 const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
   deps: {
@@ -55,17 +31,23 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
       );
     }
 
-    const flatHandlers = flatten(handlers);
-    const parseBody = bodyParser({...bodyParserOptions, multipart: true});
+    const flatHandlers = flattenHandlers(handlers);
     const paths: string[] = Object.keys(flatHandlers);
+    // eslint-disable-next-line no-console
+    console.log('Registered Paths:', JSON.stringify(paths, null, 2));
+    const invalidPath = getInvalidPath(flatHandlers);
+
+    if (invalidPath) {
+      throw new Error(
+        `One of the handler is missing/incorrect registered against path "${invalidPath}".`
+      );
+    }
+
+    const parseBody = bodyParser({...bodyParserOptions, multipart: true});
+
     const from = memoize(async (ctx: Context): Function | null => {
       const {path, method, query} = ctx;
-      const [handler, params] = getHttpHandler(
-        path,
-        method,
-        paths,
-        flatHandlers
-      );
+      const [handler, params] = getHandler(path, method, paths, flatHandlers);
 
       if (typeof handler !== 'function') {
         return null;
