@@ -60,30 +60,32 @@ export function getHandler(
   const {path, params, isExact}: Match = matchPath(currentPath, paths);
   const handler = handlers[path] && handlers[path][method];
 
-  if (handler && isExact) {
-    if (typeof handler !== 'function') {
-      throw new Error(
-        `Missing/incorrect handler registered to ${method} of ${path}.`
-      );
-    }
-
-    return [handler, params];
-  }
-
-  return [];
+  return handler && isExact ? [handler, params] : [];
 }
 
-export function getInvalidPath(handlers: Object) {
+export function findInvalidPath(handlers: Object): string {
+  function findInvalidMethod(path: string): string | typeof undefined {
+    return Object.keys(handlers[path]).find(
+      method => typeof handlers[path][method] !== 'function'
+    );
+  }
+
   const paths = Object.keys(handlers);
   const invalidPath = paths.find(path => {
     if (handlers[path] instanceof Object) {
-      return Object.keys(handlers[path]).some(
-        method => typeof handlers[path][method] !== 'function'
-      );
+      return findInvalidMethod(path);
     }
 
     return true;
   });
 
-  return invalidPath;
+  if (invalidPath) {
+    const invalidMethod = findInvalidMethod(invalidPath);
+
+    return invalidMethod
+      ? `method "${invalidMethod}" of path "${invalidPath}"`
+      : `path "${invalidPath}"`;
+  }
+
+  return '';
 }

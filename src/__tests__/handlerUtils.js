@@ -1,7 +1,7 @@
 // @flow
 import tape from 'tape-cup';
 
-import {flattenHandlers, getInvalidPath} from '../utils/handlerUtils';
+import {flattenHandlers, findInvalidPath} from '../utils/handlerUtils';
 
 const mockFn = () => {};
 const input1 = {
@@ -40,15 +40,15 @@ tape('Test getInvalidPath', async t => {
   };
 
   t.deepEqual(
-    getInvalidPath(output1),
-    '/api/users/:id',
-    'should get invalid path'
+    findInvalidPath(output1),
+    'method "PATCH" of path "/api/users/:id"',
+    'should get invalid path and method'
   );
   t.deepEqual(
-    getInvalidPath(output2),
-    '/api/users0',
+    findInvalidPath(output2),
+    'path "/api/users0"',
     'should get invalid path'
   );
-  t.deepEqual(getInvalidPath(validInput), undefined, 'should get undefined');
+  t.deepEqual(findInvalidPath(validInput), '', 'should get empty string');
   t.end();
 });

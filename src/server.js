@@ -13,7 +13,7 @@ import type {DepsObjectType, DepsType, ServiceType} from './types';
 import {
   flattenHandlers,
   getHandler,
-  getInvalidPath,
+  findInvalidPath,
 } from './utils/handlerUtils';
 import {getPatternedPaths} from './utils/pathUtils';
 
@@ -42,12 +42,22 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
     const flatHandlers = flattenHandlers(handlers);
     const paths: string[] = Object.keys(flatHandlers).sort(comparator);
     // eslint-disable-next-line no-console
-    console.log('Registered Paths:', JSON.stringify(paths, null, 2));
-    const invalidPath = getInvalidPath(flatHandlers);
+    console.log('\x1b[36m\x1b[1m', 'Registered Paths:\x1b[0m');
+    paths.forEach((path, index) => {
+      const methods = Object.keys(flatHandlers[path]).join(', ');
+      // eslint-disable-next-line no-console
+      console.log(
+        '\x1b[36m',
+        `${index + 1}. ${path} -> { ${methods} }`,
+        '\x1b[0m'
+      );
+    });
+
+    const invalidPath = findInvalidPath(flatHandlers);
 
     if (invalidPath) {
       throw new Error(
-        `One of the handlers is missing/incorrect registered against path "${invalidPath}".`
+        `Missing/incorrect handler registered against ${invalidPath}.`
       );
     }
 
