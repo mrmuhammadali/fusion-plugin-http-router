@@ -1546,7 +1546,7 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-create-universal-package@^3.4.6:
+create-universal-package@^3.4.7:
   version "3.4.7"
   resolved "https://registry.yarnpkg.com/create-universal-package/-/create-universal-package-3.4.7.tgz#b6c081e840d7e6fc741f7bd9c54226ef9eee0111"
   dependencies:
