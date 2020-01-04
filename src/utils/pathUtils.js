@@ -1,5 +1,5 @@
 // @flow
-import pathToRegexp from 'path-to-regexp';
+import {pathToRegexp} from 'path-to-regexp';
 
 import type {PatternedPath} from '../types';
 
