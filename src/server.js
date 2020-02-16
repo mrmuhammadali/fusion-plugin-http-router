@@ -64,23 +64,22 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
     const parseBody = bodyParser({...bodyParserOptions, multipart: true});
     const patternedPaths = getPatternedPaths(paths);
 
-    const from = memoize(async (ctx: Context): Function | null => {
-      const {path, method, query} = ctx;
-      const [handler, params] = getHandler(
-        path,
-        method,
-        patternedPaths,
-        flatHandlers
-      );
+    const from = memoize(async (ctx: Context): any => {
+      const {query} = ctx;
+      const {handler, match} = getHandler(ctx, patternedPaths, flatHandlers);
 
       if (typeof handler !== 'function') {
-        return null;
+        return {handler: null, match};
       }
 
       await parseBody(ctx, () => Promise.resolve());
       const {body, files = {}} = ctx.request;
 
-      return (...args) => handler({params, query, body, files}, ...args);
+      return {
+        handler: (...args) =>
+          handler({params: match.params, query, body, files}, ...args),
+        match,
+      };
     });
 
     return {from};
@@ -91,7 +90,7 @@ const plugin: FusionPlugin<DepsType, ServiceType> = createPlugin({
     next: () => Promise<any>
   ) => {
     try {
-      const handler = await service.from(ctx);
+      const {handler} = await service.from(ctx);
 
       if (typeof handler === 'function') {
         ctx.body = await handler(ctx);

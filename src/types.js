@@ -3,6 +3,7 @@ import type {Context} from 'fusion-core';
 import {IKoaBodyOptions} from 'koa-body';
 
 import {BodyParserOptionsToken, HttpHandlersToken} from './tokens';
+import type {Match} from './utils/pathUtils';
 
 export type DepsObjectType = {
   bodyParserOptions: IKoaBodyOptions,
@@ -25,5 +26,5 @@ export type PatternedPath = {
 };
 
 export type ServiceType = {
-  from: (ctx: Context) => null | Function,
+  from: (ctx: Context) => {handler: null | Function, match: Match},
 };

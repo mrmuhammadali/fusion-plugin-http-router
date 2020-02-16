@@ -1,4 +1,6 @@
 // @flow
+import type {Context} from 'fusion-core';
+
 import type {HandlersType, PatternedPath} from '../types';
 import {matchPath, type Match} from './pathUtils';
 
@@ -52,15 +54,14 @@ export function flattenHandlers(handlers: Object): HandlersType {
 }
 
 export function getHandler(
-  currentPath: string,
-  method: string,
+  ctx: Context,
   paths: PatternedPath[],
   handlers: HandlersType
-): [Function, Object] | Array<any> {
-  const {path, params, isExact}: Match = matchPath(currentPath, paths);
-  const handler = handlers[path] && handlers[path][method];
+): {handler?: Function, match: Match} {
+  const match: Match = matchPath(ctx.path, paths);
+  const handler = handlers[match.path] && handlers[match.path][ctx.method];
 
-  return handler && isExact ? [handler, params] : [];
+  return match.isExact ? {handler, match} : {match: {}};
 }
 
 export function findInvalidPath(handlers: Object): string {
